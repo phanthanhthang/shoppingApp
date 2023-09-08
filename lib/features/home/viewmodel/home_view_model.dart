@@ -3,15 +3,18 @@ import 'dart:async';
 import '../../../core/base/viewmodel/base_view_model.dart';
 import '../../../core/extensions/app_extensions.dart';
 import '../model/home_model.dart';
+import '../model/product.dart';
 import '../service/IProductService.dart';
 import '../service/product_service.dart';
+import '../service/service.dart';
 
 class HomeViewModel extends BaseViewModel {
   late IProductService productService;
   List<HomeModel> items = [];
-  List<HomeModel> basketItems = [];
+  List<Product> basketItems = [];
   double totalPrice = 0;
   bool isLoading = true;
+  List<Product> products = [];
 
   // Initialize Method
   @override
@@ -23,11 +26,19 @@ class HomeViewModel extends BaseViewModel {
   // Api connection
   Future<void> fetchItems() async {
     items = await productService.fetchAllProducts();
+    products = await Services.getProducts();
+    print(products.length);
+    setState();
+  }
+
+  Future<void> fetchData(String uid) async {
+    products = await Services.getProductsFromUser(uid);
+    print(products.length);
     setState();
   }
 
   // Product count increment
-  void incrementCount(HomeModel model) {
+  void incrementCount(Product model) {
     model.isOpen = true;
     model.count++;
     totalMoney(model);
@@ -38,7 +49,7 @@ class HomeViewModel extends BaseViewModel {
   }
 
   // Product count deincrement
-  void deIncrementCount(HomeModel model) {
+  void deIncrementCount(Product model) {
     if (model.count != 0) {
       model.count--;
       totalMoney(model);
@@ -51,13 +62,13 @@ class HomeViewModel extends BaseViewModel {
   }
 
   // Calculate total money
-  void totalMoney(HomeModel model) {
+  void totalMoney(Product model) {
     if (model.price != null) {
       totalPrice = items.fold(
           0,
           (previousValue, element) =>
               previousValue + element.price! * element.count);
-      model.productPrice = model.price! * model.count;
+      model.productPrice = int.parse(model.price!) * model.count;
       setState();
     }
   }

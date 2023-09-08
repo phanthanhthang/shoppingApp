@@ -1,4 +1,6 @@
 import 'package:device_preview/device_preview.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shopping_app/features/home/view/home_view.dart';
@@ -11,21 +13,34 @@ import '../screens/home_screen.dart';
 import '../screens/login_screen.dart';
 import '../screens/signup_screen.dart';
 import '../screens/welcome.dart';
+import 'screens/add_product.dart';
 //import 'package:firebase_core/firebase_core.dart';
 
-void main() => runApp(
-      DevicePreview(
-        enabled: false,
-        builder: (context) => MultiProvider(
-          providers: [
-            ChangeNotifierProvider(
-              create: (context) => ConnectivityManager(),
-            )
-          ],
-          child: const MyApp(),
-        ),
+Future main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  if (kIsWeb) {
+    await Firebase.initializeApp(
+        options: const FirebaseOptions(
+            apiKey: "AIzaSyBUYgLDXqsHfNZ71c-0_xy14aWdl82gFTI",
+            appId: "1:730340885525:web:f36a374d6c8250d2fdfa1c",
+            messagingSenderId: "730340885525",
+            projectId: "shopingapp-61986"));
+  }
+  await Firebase.initializeApp();
+  runApp(
+    DevicePreview(
+      enabled: false,
+      builder: (context) => MultiProvider(
+        providers: [
+          ChangeNotifierProvider(
+            create: (context) => ConnectivityManager(),
+          )
+        ],
+        child: const MyApp(),
       ),
-    );
+    ),
+  );
+}
 
 class MyApp extends StatelessWidget {
   static const String path = '/';
@@ -45,9 +60,12 @@ class MyApp extends StatelessWidget {
       routes: {
         HomeScreen.id: (context) => HomeScreen(),
         LoginScreen.id: (context) => LoginScreen(),
+        AddProduct.id: (context) => const AddProduct(uid: ""),
         SignUpScreen.id: (context) => SignUpScreen(),
-        WelcomeScreen.id: (context) => WelcomeScreen(),
-        '/home': (context) => const HomeView(),
+        "/image": (context) => const WelcomeScreen(
+              imageUrl: "http://192.168.1.197/ProductsDB/uploads/cafe4.png",
+            ),
+        '/home': (context) => const HomeView(uid: ""),
       },
     );
   }

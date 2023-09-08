@@ -27,7 +27,7 @@ class NoInternetView extends StatelessWidget {
             builder: (context, model, child) {
               if (model.isOnline != null) {
                 return model.isOnline!
-                    ? const HomeView()
+                    ? const HomeView(uid: "")
                     : _bodyView(context, viewModel);
               }
               return Center(

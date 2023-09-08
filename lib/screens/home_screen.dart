@@ -3,15 +3,36 @@ import '../components/components.dart';
 import '../screens/login_screen.dart';
 import '../screens/signup_screen.dart';
 import '../features/home/view/home_view.dart';
+import 'package:barcode_scan2/barcode_scan2.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
   static String id = 'home_screen';
+  static String qrCode = "";
+
+  Future<String> _scanQR() async {
+    AppBar(
+      backgroundColor: const Color(0xFFFF7D54),
+      title: const Text(
+        'Scanning Code',
+        style: TextStyle(
+          fontFamily: 'Product Sans',
+          fontWeight: FontWeight.bold,
+          fontSize: 20.0,
+        ),
+      ),
+      centerTitle: true,
+    );
+    var qrResult = await BarcodeScanner.scan();
+    qrCode = qrResult.rawContent;
+    print(qrCode);
+    return qrResult.rawContent;
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Color.fromARGB(255, 237, 231, 231),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(25),
@@ -35,7 +56,12 @@ class HomeScreen extends StatelessWidget {
                         child: CustomButton(
                           buttonText: 'Get started',
                           onPressed: () {
-                            Navigator.pushNamed(context, '/home');
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const HomeView(uid: ""),
+                              ),
+                            );
                           },
                         ),
                       ),
@@ -68,7 +94,13 @@ class HomeScreen extends StatelessWidget {
                           buttonText: 'Scan QR Code',
                           isOutlined: true,
                           onPressed: () {
-                            Navigator.pushNamed(context, SignUpScreen.id);
+                            _scanQR().then((value) => Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => HomeView(uid: value),
+                                  ),
+                                ));
+                            //print(qrCode);
                           },
                         ),
                       ),

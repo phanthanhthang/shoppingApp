@@ -4,6 +4,7 @@ import '../../../product/component/text/subtitle1_text.dart';
 import '../../../core/base/view/base_view.dart';
 import '../../../product/component/card/special_icon_card.dart';
 import '../../../product/component/card/special_text_card.dart';
+import '../../../screens/add_product.dart';
 import '../viewmodel/home_view_model.dart';
 import '../../../core/extensions/app_extensions.dart';
 import '../../../product/component/card/item_card.dart';
@@ -12,18 +13,20 @@ import '../../../product/component/image/responsive_image.dart';
 import '../../../product/component/text/bold_title.dart';
 import '../../../product/component/text/primary_bold_text.dart';
 import '../../../product/component/text/product_name.dart';
+import '../../../screens/welcome.dart';
 
 class HomeView extends StatelessWidget {
   static const path = '/home';
-  const HomeView({Key? key}) : super(key: key);
-
+  const HomeView({super.key, required this.uid});
+  final String uid;
   @override
   Widget build(BuildContext context) => BaseView<HomeViewModel>(
         viewModel: HomeViewModel(),
         onModelReady: (model) {
           model.setContext(context);
           model.init();
-          model.fetchItems();
+          uid == "" ? model.fetchItems() : model.fetchData(uid);
+          print(uid);
         },
         onPageBuilder: (BuildContext context, HomeViewModel viewModel) {
           Widget isLoading = viewModel.isLoading
@@ -49,12 +52,21 @@ class HomeView extends StatelessWidget {
         title: _appBarTitle(context),
         actions: [
           _totalMoney(context, viewModel),
-          Padding(
-              padding: EdgeInsets.only(right: 20.0),
-              child: GestureDetector(
-                onTap: () {},
-                child: Icon(Icons.account_circle),
-              )),
+          uid != ""
+              ? Padding(
+                  padding: EdgeInsets.only(right: 20.0),
+                  child: GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => AddProduct(uid: uid),
+                        ),
+                      );
+                    },
+                    child: Icon(Icons.add),
+                  ))
+              : SizedBox(),
         ],
       );
 
@@ -92,15 +104,26 @@ class HomeView extends StatelessWidget {
         child: GridView.builder(
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 2),
-          itemCount: viewModel.items.length,
+          itemCount: viewModel.products.length,
           itemBuilder: (context, index) => Padding(
-            padding: context.paddingLow,
-            child: ItemCard(
-              context: context,
-              model: viewModel.items[index],
-              viewModel: viewModel,
-            ),
-          ),
+              padding: context.paddingLow,
+              child: GestureDetector(
+                onTap: () {
+                  print("tapped");
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => WelcomeScreen(
+                          imageUrl: viewModel.products[index].image ?? ""),
+                    ),
+                  );
+                },
+                child: ItemCard(
+                  context: context,
+                  model: viewModel.products[index],
+                  viewModel: viewModel,
+                ),
+              )),
         ),
       );
 

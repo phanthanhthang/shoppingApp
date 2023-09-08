@@ -12,7 +12,7 @@ class NavigationRoute {
       case MyApp.path:
         return CupertinoPageRoute(builder: (_) => const MyApp());
       case HomeView.path:
-        return CupertinoPageRoute(builder: (_) => const HomeView());
+        return CupertinoPageRoute(builder: (_) => const HomeView(uid: ""));
       case NoInternetView.path:
         return CupertinoPageRoute(builder: (_) => const NoInternetView());
 
